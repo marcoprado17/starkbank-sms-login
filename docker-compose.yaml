@@ -1,0 +1,25 @@
+version: "3"
+services:
+  starkbank-sms-login:
+    build: .
+    ports:
+      - "80:3000"
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+  mongodb:
+    image: mongo:3.6.2
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "27017:27017"
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+    volumes:
+      - ~/mongodb_data:/data/db
