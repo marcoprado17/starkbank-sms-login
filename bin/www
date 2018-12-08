@@ -8,6 +8,7 @@ var app = require('../app');
 var debug = require('debug')('starkbank-sms-login:server');
 var http = require('http');
 const db = require('../database/db');
+const agendaInit = require('../jobs/agenda').init;
 
 /**
  * Get port from environment and store in Express.
@@ -28,6 +29,7 @@ var server = http.createServer(app);
 db.then(() => {
   console.log('Db connected');
   server.listen(port);
+  agendaInit();
   server.on('error', onError);
   server.on('listening', onListening);
 }).catch((err) => {

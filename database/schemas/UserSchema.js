@@ -26,7 +26,7 @@ const UserSchema = new Schema({
         type: String,
         default: function() {
             try {
-                const number = phoneUtil.parseAndKeepRawInput(this.tel, regionCode);
+                const number = phoneUtil.parseAndKeepRawInput(this.phoneNumber, regionCode);
                 return number.getNationalNumber()
             }
             catch(err) {

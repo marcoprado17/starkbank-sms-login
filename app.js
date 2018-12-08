@@ -21,19 +21,19 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//middleware to access response body object and remove fields that start with '__'
-// app.use(mung.json(
-//     function transform(body, req, res) {
-//         return removeResponsePrivateFieldsMiddleware(body);
-//     }
-// ));
+// Middleware to access response body object and remove fields that start with '__'
+app.use(mung.json(
+    function transform(body, req, res) {
+        return removeResponsePrivateFieldsMiddleware(body);
+    }
+));
 
+// Blocking requests that try setting a private field (starts with '_')
 app.use('/', blockSettingPrivateFieldsExternallyMiddleware);
 
+// Registering routes
 app.use('/', indexRouter);
 app.use('/signin', signinRouter);
 app.use('/login', loginRouter);
-
-app.use('/', removeResponsePrivateFieldsMiddleware);
 
 module.exports = app;
