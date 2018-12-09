@@ -3,14 +3,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
-var mung = require('express-mung');
+const httpErrors = require('http-errors-express').default;
 
 const indexRouter = require('./routes/index');
-const signinRouter = require('./routes/signin');
-const loginRouter = require('./routes/login');
-
-const blockSettingPrivateFieldsExternallyMiddleware = require('./middlewares/blockSettingPrivateFieldsExternally');
-const removeResponsePrivateFieldsMiddleware = require('./middlewares/removeResponsePrivateFields');
+const userSigninRouter = require('./routes/api/rpc/user/signin');
+const userLoginRouter = require('./routes/api/rpc/user/login');
 
 const app = express();
 
@@ -21,19 +18,24 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware to access response body object and remove fields that start with '__'
-app.use(mung.json(
-    function transform(body, req, res) {
-        return removeResponsePrivateFieldsMiddleware(body);
-    }
-));
-
-// Blocking requests that try setting a private field (starts with '_')
-app.use('/', blockSettingPrivateFieldsExternallyMiddleware);
-
 // Registering routes
 app.use('/', indexRouter);
-app.use('/signin', signinRouter);
-app.use('/login', loginRouter);
+app.use('/api/rpc/user/signin', userSigninRouter);
+app.use('/api/rpc/user/login', userLoginRouter);
+
+// Dealing with errors
+app.use(httpErrors({
+    before: (err, req, isExposed, cb) => {
+        if(!'status' in err || err.status === 500 || err.status === "500") {
+            console.error("err.code:", err.code);
+            console.error("typeof err.code:", typeof err.code);
+            console.error("err:", err);
+        }
+        else {
+            console.warn("err:", err);
+        }
+        cb();
+    }
+}));
 
 module.exports = app;

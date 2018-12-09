@@ -1,29 +1,22 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const rand = require('../../utils/rand');
-const phone = require('../../utils/phone');
 
+// Schema of a user
+// Fields that start with '_' can't be edited through the api (blockSettingPrivateFieldsExternally)
+// Fields that start with '__' are hidden from api responses (removeResponsePrivateFields)
 const UserSchema = new Schema({
     phoneNumber: {
-        type: String,
-        validate: {
-            validator: (v) => phone.isValidPhoneNumber(v),
-            message: () => `Número de telefone inválido. Formatos válidos: (xx) xxxx-xxxx, +55 xx xxxx xxxx, xxxxxxxxxx...`
-        },
-        required: true
+        type: String
     },
     _normalizedPhoneNumber: {
         type: String,
-        default: phone.getNormalizedNumberForMongooseDefault,
         unique: true
     },
     __token: {
-        type: String,
-        default: () => rand.getRandomToken()
+        type: String
     },
     __smsSent: {
-        type: Boolean,
-        default: false
+        type: Boolean
     }
 });
 

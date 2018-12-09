@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const UserSchema = require('../database/schemas/UserSchema')
 const redisClient = require('../database/redisdb');
+const assert = require('assert');
 
 const timeToRenewTokenInSeconds = 300;
 
 /* Endpoint to register a new user */
 router.post('/', async (req, res, next) => {
-  const user = new UserSchema(req.body);
-
+  let user = new UserSchema(req.body);
   try {
     // Trying to create a new user
     await user.save();
@@ -18,8 +18,9 @@ router.post('/', async (req, res, next) => {
         .status(201)
         .json(user);
   }
-  // Fail to create user
+  // Fail to create user. Probably, a user with that phoneNumber already exists; in this case a new token will be generated
   catch(err) {
+    console.log(err);
     try {
       let ttl = await redisClient.ttl(`normalizedPhoneNumberTokenCreation${user._normalizedPhoneNumber}`);
       if(ttl > 0) {
@@ -38,7 +39,7 @@ router.post('/', async (req, res, next) => {
         },
         { upsert: false, new: true, runValidators: true }
       );
-      // Adding to redis a key with a ttl timeToRenewTokenInSeconds to know when the token can be regenrated
+      // Adding to redis a key with a ttl timeToRenewTokenInSeconds to know when the token can be regenerated
       await redisClient.set(`normalizedPhoneNumberTokenCreation${user._normalizedPhoneNumber}`, true, 'EX', timeToRenewTokenInSeconds);
       res
         .status(200)
@@ -47,10 +48,11 @@ router.post('/', async (req, res, next) => {
         });
     }
     catch(err) {
-      console.error(err);
       res
         .status(500)
-        .json(err);
+        .json({
+          message: err.message
+        });
     }
   }
 });

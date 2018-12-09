@@ -61,4 +61,4 @@ typings/
 .next
 
 # Script that sets sensitive credentials
-set_env_vars.sh
+setEnvVars.sh
