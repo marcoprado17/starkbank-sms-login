@@ -1,5 +1,4 @@
 const UserSchema = require('../database/schemas/UserSchema');
-const TextMessageService = require('comtele-sdk').TextMessageService;
 const apiKey = process.env.SMS_API_KEY;
 const axios = require('axios');
 const loginUrl = process.env.LOGIN_URL;
@@ -11,7 +10,7 @@ sendSmss = async () => {
     })
     .limit(1)
     .then((users) => {
-        pSendAllSmss = [];
+        let pSendAllSmss = [];
         users.forEach((user) => {
             console.log(`user phone number: ${user._normalizedPhoneNumber}`)
             pSendAllSmss.push(new Promise(async (resolve, reject) => {
@@ -31,6 +30,7 @@ sendSmss = async () => {
                     //         "auth-key": apiKey
                     //     }
                     // });
+                    console.debug("token:", user.__token);
                     r = {
                         status: 200
                     };
@@ -47,11 +47,11 @@ sendSmss = async () => {
                     });
                 }
             }));
-        })
+        });
         return Promise.all(pSendAllSmss);
     })
     .then((sendAllSmssResults) => {
-        pAllUpdates = []
+        let pAllUpdates = [];
         sendAllSmssResults.forEach((sendSmsResult) => {
             if(sendSmsResult.success) {
                 pAllUpdates.push(new Promise(async (resolve, reject) => {
@@ -72,12 +72,12 @@ sendSmss = async () => {
                     }
                 }));
             }
-        })
+        });
         return pAllUpdates;
     })
     .catch((err) => {
         console.log(err);
     })
-}
+};
 
 module.exports = sendSmss;

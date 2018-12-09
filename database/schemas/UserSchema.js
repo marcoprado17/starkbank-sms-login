@@ -1,38 +1,21 @@
-const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const rand = require('../../utils/rand');
+const phone = require('../../utils/phone');
 
-const regionCode = 'BR';
-
+// TODO: Remove unique from _normalizedPhoneNumber and allow new signin (of the same _normalizedPhoneNumber) after certain time
 const UserSchema = new Schema({
     phoneNumber: {
         type: String,
         validate: {
-            validator: (v) => {
-                try {
-                    const number = phoneUtil.parseAndKeepRawInput(v, regionCode);
-                    return phoneUtil.isValidNumberForRegion(number, regionCode);
-                }
-                catch(err) {
-                    return false;
-                }
-            },
+            validator: (v) => phone.isValidPhoneNumber(v),
             message: () => `Número de telefone inválido. Formatos válidos: (xx) xxxx-xxxx, +55 xx xxxx xxxx, xxxxxxxxxx...`
         },
         required: true
     },
     _normalizedPhoneNumber: {
         type: String,
-        default: function() {
-            try {
-                const number = phoneUtil.parseAndKeepRawInput(this.phoneNumber, regionCode);
-                return number.getNationalNumber()
-            }
-            catch(err) {
-                return null;
-            }
-        },
+        default: phone.getNormalizedNumberForMongooseDefault,
         unique: true
     },
     __token: {
