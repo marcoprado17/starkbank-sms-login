@@ -2,8 +2,7 @@ const configs = require('../configs');
 const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
 
 assertValidPhoneNumber = (phoneNumber) => {
-    let invalidPhoneNumberErr = new Error("Número de telefone inválido. Formatos aceitos: xx xxxxxxxxx, xxxxxxxxxxx, +55 (xx) xxxxx-xxxx, 55 xx xxxxx xxxx, 55 xxxxxxxxxxx...");
-    invalidPhoneNumberErr.code = "ERR_ASSERTION";
+    let invalidPhoneNumberErr = new Error("Invalid phone number. Accepted formats: xx xxxxxxxxx, xxxxxxxxxxx, +55 (xx) xxxxx-xxxx, 55 xx xxxxx xxxx, 55 xxxxxxxxxxx...");
     try {
         const number = phoneUtil.parseAndKeepRawInput(phoneNumber, configs.regionCode);
         const isValidNumberForRegion = phoneUtil.isValidNumberForRegion(number, configs.regionCode);

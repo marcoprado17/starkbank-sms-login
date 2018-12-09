@@ -6,13 +6,13 @@ const loginUrl = process.env.LOGIN_URL;
 sendSmss = async () => {
     console.log("Sending SMSs");
     await UserSchema.find({
-        __smsSent: false
+        smsSent: false
     })
     .limit(1)
     .then((users) => {
         let pSendAllSmss = [];
         users.forEach((user) => {
-            console.log(`user phone number: ${user._normalizedPhoneNumber}`)
+            console.log(`user phone number: ${user.normalizedPhoneNumber}`)
             pSendAllSmss.push(new Promise(async (resolve, reject) => {
                 try {
                     // TODO: Get a new account on SMS gateway and enable send of SMS
@@ -21,8 +21,8 @@ sendSmss = async () => {
                     //     url: 'https://sms.comtele.com.br/api/v2/send',
                     //     data: {
                     //         sender: 'Marco',
-                    //         content: `Starkbank backend test by Marco. Token: ${user.__token}. Login url: ${loginUrl}`,
-                    //         receivers: [`${user._normalizedPhoneNumber}`].join(),
+                    //         content: `Starkbank backend test by Marco. Token: ${user.token}. Login url: ${loginUrl}`,
+                    //         receivers: [`${user.normalizedPhoneNumber}`].join(),
                     //         timeout: 60000,
                     //     },
                     //     headers: {
@@ -30,7 +30,7 @@ sendSmss = async () => {
                     //         "auth-key": apiKey
                     //     }
                     // });
-                    console.debug("token:", user.__token);
+                    console.debug("token:", user.token);
                     r = {
                         status: 200
                     };
@@ -58,7 +58,7 @@ sendSmss = async () => {
                     try {
                         await UserSchema.findOneAndUpdate(
                             { _id: sendSmsResult.userId },
-                            { $set: { __smsSent: true }}
+                            { $set: { smsSent: true }}
                         );
                         resolve({
                             success: true

@@ -7,9 +7,9 @@ signinReqToCreationParams = (req) => {
         try {
             let creationParams = {
                 phoneNumber: req.body.phoneNumber,
-                _normalizedPhoneNumber: phoneNumberService.getNormalizedPhoneNumber(req.body.phoneNumber),
-                __token: randomGeneratorService.getRandomString(configs.tokenLength, configs.tokenChars),
-                __smsSent: false
+                normalizedPhoneNumber: phoneNumberService.getNormalizedPhoneNumber(req.body.phoneNumber),
+                token: randomGeneratorService.getRandomString(configs.tokenLength, configs.tokenChars),
+                smsSent: false
             };
             resolve(creationParams);
         }
@@ -19,11 +19,22 @@ signinReqToCreationParams = (req) => {
     });
 }
 
-SIGNIN_REQ_TO_CREATION_PARAMS_ERROR_CODES = {
-
+loginReqToLoginParams = (req) => {
+    return new Promise((resolve, reject) => {
+        try {
+            let loginParams = {
+                normalizedPhoneNumber: phoneNumberService.getNormalizedPhoneNumber(req.body.phoneNumber),
+                tokenCandidate: req.body.token,
+            };
+            resolve(loginParams);
+        }
+        catch(err) {
+            reject(err);
+        }
+    });
 }
 
 module.exports = {
     signinReqToCreationParams,
-    SIGNIN_REQ_TO_CREATION_PARAMS_ERROR_CODES
+    loginReqToLoginParams
 }
