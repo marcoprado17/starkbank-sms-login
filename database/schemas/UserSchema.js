@@ -3,7 +3,6 @@ const Schema = mongoose.Schema;
 const rand = require('../../utils/rand');
 const phone = require('../../utils/phone');
 
-// TODO: Remove unique from _normalizedPhoneNumber and allow new signin (of the same _normalizedPhoneNumber) after certain time
 const UserSchema = new Schema({
     phoneNumber: {
         type: String,

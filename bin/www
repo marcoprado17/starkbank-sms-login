@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('starkbank-sms-login:server');
 var http = require('http');
-const db = require('../database/db');
+const mongodb = require('../database/mongodb');
 const agendaInit = require('../jobs/agenda').init;
 
 /**
@@ -26,7 +26,7 @@ var server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces after connect to database
  */
-db.then(() => {
+mongodb.then(() => {
   console.log('Db connected');
   server.listen(port);
   agendaInit();

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "agenda": "^2.0.2",
+    "async-redis": "^1.1.4",
     "axios": "^0.18.0",
     "comtele-sdk": "^1.1.6",
     "cookie-parser": "~1.4.3",

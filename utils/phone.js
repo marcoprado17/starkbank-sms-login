@@ -12,8 +12,6 @@ isValidPhoneNumber = (v) => {
 };
 
 getNormalizedNumber = (rawPhoneNumber) => {
-    console.log("getNormalizedNumber chamado");
-    console.log("rawPhoneNumber:", rawPhoneNumber);
     try {
         const number = phoneUtil.parseAndKeepRawInput(rawPhoneNumber, configs.regionCode);
         return number.getNationalNumber()
@@ -23,7 +21,7 @@ getNormalizedNumber = (rawPhoneNumber) => {
     }
 };
 
-// Must be declared without arrow functions because this is setted by mongoose and arrow functions change the behaviour of this
+// Must be declared without arrow functions because this is setted by mongoose and arrow functions change the behaviour of this keyword
 getNormalizedNumberForMongooseDefault = function() {
     return getNormalizedNumber(this.phoneNumber);
 };

@@ -8,6 +8,6 @@ mongoose.connect(mongoConnectionString);
 mongoose.Promise = global.Promise;
 //Get the default connection
 
-const db = mongoose.connection;
+const mongodb = mongoose.connection;
 
-module.exports = db;
+module.exports = mongodb;
