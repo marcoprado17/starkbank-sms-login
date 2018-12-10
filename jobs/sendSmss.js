@@ -17,23 +17,23 @@ sendSmss = async () => {
             pSendAllSmss.push(new Promise(async (resolve, reject) => {
                 try {
                     // TODO: Get a new account on SMS gateway and enable send of SMS
-                    // r = await axios({
-                    //     method: 'post',
-                    //     url: 'https://sms.comtele.com.br/api/v2/send',
-                    //     data: {
-                    //         sender: 'Marco',
-                    //         content: `Starkbank backend test by Marco. Token: ${user.token}. Login url: ${loginUrl}`,
-                    //         receivers: [`${user.normalizedPhoneNumber}`].join(),
-                    //         timeout: 60000,
-                    //     },
-                    //     headers: {
-                    //         "Content-Type": "application/json",
-                    //         "auth-key": apiKey
-                    //     }
-                    // });
-                    r = {
-                        status: 200
-                    };
+                    r = await axios({
+                        method: 'post',
+                        url: 'https://sms.comtele.com.br/api/v2/send',
+                        data: {
+                            sender: 'Marco',
+                            content: `Starkbank backend test by Marco. Token: ${user.token}. Login url: ${loginUrl}`,
+                            receivers: [`${user.normalizedPhoneNumber}`].join(),
+                            timeout: 60000,
+                        },
+                        headers: {
+                            "Content-Type": "application/json",
+                            "auth-key": apiKey
+                        }
+                    });
+                    // r = {
+                    //     status: 200
+                    // };
                     resolve({
                         success: (r.status >= 200 && r.status < 300),
                         userId: user._id

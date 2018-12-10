@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "dev": "sudo su -c 'source ./setEnvVars.sh; docker-compose build; docker-compose up'",
-    "prod": "sudo docker-compose build; sudo docker-compose up"
+    "prod": "sudo su -c 'export DB_USERNAME=root; export DB_PASSWORD=123456; export DB_DATABASE=starkbank; export SMS_API_KEY=adb1f28a-d09a-427a-a9dc-74e2d2d7da76; export LOGIN_URL=http://localhost/login; export REDIS_PASSWORD=a2b4c6d8e0;docker-compose build; docker-compose up'"
   },
   "dependencies": {
     "agenda": "^2.0.2",
