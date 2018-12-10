@@ -9,7 +9,7 @@ const userFirewallService = require("../../../../services/user/userFirewallServi
 /* Endpoint for user login */
 router.post('/', async (req, res, next) => {
     userFirewallService
-        .reqIpOk(req)
+        .reqIpOk(req) // Passing through userFirewall (block IPs that did a lot of failed attempts)
         .catch((err) => {
             switch(err.code) {
                 case "IP_BLOCKED": // Invalid request
@@ -47,8 +47,10 @@ router.post('/', async (req, res, next) => {
                     if("code" in err && err.code == "INVALID_TOKEN") { // Updating userFirewall with new failed attempt
                         return userFirewallService
                             .onUserLoginFailAttempt(req)
-                            .then((nAttempts) => {
+                            .then(({nAttempts, nIpAttemptsBeforeBlockingIt, ttl}) => {
                                 console.log("nAttempts: ", nAttempts);
+                                console.log("nIpAttemptsBeforeBlockingIt: ", nIpAttemptsBeforeBlockingIt);
+                                err.message = err.message + ` Attempt ${nAttempts}/${nIpAttemptsBeforeBlockingIt} before blocking your ip. Your attempts counter will be reseted in ${ttl} second(s).`;
                             })
                             .catch((onUserLoginFailAttemptErr) => {
                                 console.error(onUserLoginFailAttemptErr);

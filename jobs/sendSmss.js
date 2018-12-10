@@ -12,7 +12,8 @@ sendSmss = async () => {
     .then((users) => {
         let pSendAllSmss = [];
         users.forEach((user) => {
-            console.log(`user phone number: ${user.normalizedPhoneNumber}`)
+            console.log(`user phone number: ${user.normalizedPhoneNumber}`);
+            console.debug("user token:", user.token);
             pSendAllSmss.push(new Promise(async (resolve, reject) => {
                 try {
                     // TODO: Get a new account on SMS gateway and enable send of SMS
@@ -30,7 +31,6 @@ sendSmss = async () => {
                     //         "auth-key": apiKey
                     //     }
                     // });
-                    console.debug("token:", user.token);
                     r = {
                         status: 200
                     };
