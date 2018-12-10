@@ -8,12 +8,13 @@ const createError = require('http-errors');
 /* Endpoint to register a new user */
 router.post('/', async (req, res, next) => {
     userReqValidatorService
-        .signinReqOk(req).catch((err) => {
+        .signinReqOk(req)
+        .catch((err) => {
             switch(err.code) {
                 case "BAD_REQUEST": // Bad request
-                    throw createError.BadRequest(err.message);
+                    return Promise.reject(createError.BadRequest(err.message));
                 default: // Unexpected error
-                    throw createError.InternalServerError(err);
+                    return Promise.reject( createError.InternalServerError(err));
             }
         })
         .then((req) => {
@@ -22,7 +23,7 @@ router.post('/', async (req, res, next) => {
                 .catch((err) => { 
                     switch(err.code){
                         default: // Unexpected error
-                            throw createError.InternalServerError(err);
+                            return Promise.reject(createError.InternalServerError(err));
                     }
                 });
         })
@@ -32,9 +33,9 @@ router.post('/', async (req, res, next) => {
                 .catch((err) => {
                     switch(err.code){
                         case 11000: // Duplicated unique key
-                            throw createError.BadRequest(err.message);
+                            return Promise.reject(createError.BadRequest(err.message));
                         default: // Unexpected error
-                            throw createError.InternalServerError(err);
+                            return Promise.reject(createError.InternalServerError(err));
                     }
                 });
         })

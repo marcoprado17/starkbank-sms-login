@@ -4,17 +4,31 @@ const userReqValidatorService = require('../../../../services/user/userReqValida
 const userMapperService = require('../../../../services/user/userMapperService');
 const userService = require('../../../../services/user/userService');
 const createError = require('http-errors');
+const userFirewallService = require("../../../../services/user/userFirewallService");
 
 /* Endpoint for user login */
 router.post('/', async (req, res, next) => {
-    userReqValidatorService
-        .loginReqOk(req).catch((err) => {
+    userFirewallService
+        .reqIpOk(req)
+        .catch((err) => {
             switch(err.code) {
-                case "BAD_REQUEST": // Invalid request
-                    throw createError.BadRequest(err.message);
+                case "IP_BLOCKED": // Invalid request
+                    return Promise.reject(createError.TooManyRequests(err.message));
                 default: // Unexpected error
-                    throw createError.InternalServerError(err);
+                    return Promise.reject(createError.InternalServerError(err));
             }
+        })
+        .then((req) => {
+            return userReqValidatorService
+                .loginReqOk(req)
+                .catch((err) => {
+                    switch(err.code) {
+                        case "BAD_REQUEST": // Invalid request
+                            return Promise.reject(createError.BadRequest(err.message));
+                        default: // Unexpected error
+                            return Promise.reject(createError.InternalServerError(err));
+                    }
+                });
         })
         .then((req) => {
             return userMapperService
@@ -22,7 +36,7 @@ router.post('/', async (req, res, next) => {
                 .catch((err) => {
                     switch(err.code){
                         default: // Unexpected error
-                            throw createError.InternalServerError(err);
+                        return Promise.reject(createError.InternalServerError(err));
                     }
                 });
         })
@@ -30,11 +44,29 @@ router.post('/', async (req, res, next) => {
             return userService
                 .login(loginParams)
                 .catch((err) => {
+                    if("code" in err && err.code == "INVALID_TOKEN") { // Updating userFirewall with new failed attempt
+                        return userFirewallService
+                            .onUserLoginFailAttempt(req)
+                            .then((nAttempts) => {
+                                console.log("nAttempts: ", nAttempts);
+                            })
+                            .catch((onUserLoginFailAttemptErr) => {
+                                console.error(onUserLoginFailAttemptErr);
+                            })
+                            .then(() => {
+                                return Promise.reject(err); 
+                            });
+                    }
+                    else {
+                        return Promise.reject(err);
+                    }
+                })
+                .catch((err) => {
                     switch(err.code){
                         case "INVALID_TOKEN": // Invalid token
-                            throw createError.BadRequest(err.message);
+                            return Promise.reject(createError.BadRequest(err.message));
                         default: // Unexpected error
-                            throw createError.InternalServerError(err);
+                            return Promise.reject(createError.InternalServerError(err));
                     }
                 });
         })
